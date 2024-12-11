@@ -13,7 +13,7 @@ Table of Contents:
 
 
 
-1. Introduction
+- Introduction
 
 Hi,
 
@@ -21,7 +21,7 @@ This is a small project I created regarding application performance monitoring w
 Since Zabbix currently does not have a defined APM module integrated in its software, I explored opportunities to create this by the means of automation, scripting, configuration file manipulation, and a Zabbix agent.
 
 
-2. What is APM?
+- What is APM?
 APM (or Application Performance Monitoring) is a process that uses software tools to monitor the performance of business applications. We've seen examples of APM used in CI/CD applications such as Jenkins, GitLab, etc. APM strives to detect and diagnose complex application performance problems to maintain an expected level of service.
 
 APM tools can:
@@ -30,10 +30,10 @@ APM tools can:
 -- Improve user experience: Track user interactions and help determine where to allocate resources.
 -- Reduce downtime: Help businesses maintain high availability for their applications.
 
-3. Zabbix and APM
+- Zabbix and APM
 
 TBA
 
-4. ZabbixAPM Project Explanation
+- ZabbixAPM Project Explanation
 
 TBA
