@@ -1,0 +1,135 @@
+zabbix_export:
+  version: '6.0'
+  date: '2024-12-11T21:46:35Z'
+  groups:
+    - uuid: 57b7ae836ca64446ba2c296389c009b7
+      name: Templates/Modules
+  templates:
+    - uuid: 27e8d1941fc147fd9c246c42059849cd
+      template: 'Windows processes by Zabbix agent'
+      name: 'Windows processes by Zabbix agent'
+      description: 'Creation of items to populate running processes Windows applications and background resources.'
+      groups:
+        - name: Templates/Modules
+      items:
+        - uuid: 7390eb1fa5d44657a298e20892874878
+          name: 'Latest Dump File'
+          key: crash.file.latest
+          delay: 5m
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - '300'
+        - uuid: 9a866139dd844e4d8772268f0cb493f7
+          name: 'MRX: Data.rrd Monitoring'
+          key: file.size.rrd
+          units: B
+        - uuid: 98e9b1ec721a4b5c9ca8634061e443a3
+          name: 'Total Number of Processes'
+          type: CALCULATED
+          key: max.proc.count
+          history: 7d
+          params: 'max(//proc.count,1h)'
+        - uuid: 1da6ea583c6942bd80f8f26e863ca0df
+          name: 'Number of Running ICS Processes'
+          key: proc.count
+          history: 7d
+          trends: '0'
+      discovery_rules:
+        - uuid: 8181b3c00ef84bf6ab7c5302fd6f4b8e
+          name: 'Windows process discovery'
+          key: proc.discovery
+          delay: 1h
+          item_prototypes:
+            - uuid: 13b99b76397140d88269044f40b5e299
+              name: '{#PROCESS.NAME}: CPU usage - Unit'
+              key: 'proc.cpu_ghz[{#PROCESS.NAME}]'
+              delay: 10m
+              value_type: FLOAT
+              units: GHz
+            - uuid: 65d3a207c9f840a0a1d662091be8dcf3
+              name: '{#PROCESS.NAME}: CPU Usage - %'
+              key: 'proc.cpu_percent[{#PROCESS.NAME}]'
+              delay: 10m
+              value_type: FLOAT
+              units: '%'
+            - uuid: 15bba748c544466aa72ad15cc2deddae
+              name: '{#PROCESS.NAME}: Memory Usage'
+              key: 'proc.memory[{#PROCESS.NAME}]'
+              delay: 10m
+              value_type: FLOAT
+              units: B
+            - uuid: e0fc1f50cfb04b9b8849b7c19daab0e1
+              name: 'State of Process {#PROCESS.NAME}'
+              key: 'proc.status[{#PROCESS.NAME}]'
+              valuemap:
+                name: 'Process State'
+              trigger_prototypes:
+                - uuid: c1e03999d651425c9126ad0a5e08d209
+                  expression: 'last(/Windows processes by Zabbix agent/proc.status[{#PROCESS.NAME}])=1'
+                  name: 'Process {#PROCESS.NAME} is not running'
+                  priority: INFO
+            - uuid: c59adaf4202544ebb2dcf490b477d961
+              name: 'Top CPU Usage in Percent'
+              type: CALCULATED
+              key: proc.topcpu_percent
+              value_type: FLOAT
+              units: '%'
+              params: 'max("proc.cpu_percent[{#PROCESS.NAME}]",5)'
+            - uuid: 12e2ba823cbb45a5a3d9e9e6b4d60064
+              name: 'Top Memory Usage'
+              type: CALCULATED
+              key: proc.topmemory
+              units: B
+              params: 'max("proc.memory[{#PROCESS.NAME}]",5)'
+          graph_prototypes:
+            - uuid: 605e059815324e9f904e7b244aedc0a0
+              name: 'ICS Process State'
+              graph_items:
+                - color: 199C0D
+                  calc_fnc: ALL
+                  item:
+                    host: 'Windows processes by Zabbix agent'
+                    key: 'proc.status[{#PROCESS.NAME}]'
+            - uuid: 2e7d906e98ee4508887ce8e398171785
+              name: Test1
+              graph_items:
+                - color: 199C0D
+                  calc_fnc: ALL
+                  item:
+                    host: 'Windows processes by Zabbix agent'
+                    key: 'proc.cpu_percent[{#PROCESS.NAME}]'
+      valuemaps:
+        - uuid: 1d7e607f550e443d9ccf6414ef34b428
+          name: 'Process State'
+          mappings:
+            - value: '0'
+              newvalue: Running
+            - value: '1'
+              newvalue: 'Not Running'
+  graphs:
+    - uuid: 9de2086d8b844580be1b7b9daabb647f
+      name: 'MRX: Dara.rrd File Size'
+      graph_items:
+        - color: F06292
+          calc_fnc: ALL
+          item:
+            host: 'Windows processes by Zabbix agent'
+            key: file.size.rrd
+    - uuid: df01d28752c34f9dbe625534156b2c58
+      name: 'Number of Running Processes'
+      graph_items:
+        - color: 00FF00
+          calc_fnc: ALL
+          item:
+            host: 'Windows processes by Zabbix agent'
+            key: proc.count
+        - sortorder: '1'
+          drawtype: DASHED_LINE
+          color: FFF176
+          calc_fnc: ALL
+          item:
+            host: 'Windows processes by Zabbix agent'
+            key: max.proc.count
